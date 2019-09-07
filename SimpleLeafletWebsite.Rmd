@@ -1,0 +1,38 @@
+---
+title: "Warning Flooded Areas In Ho Chi Minh City"
+author: "hoaihuongbk"
+date: "9/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+The data using in this example is warning flooded areas in Ho Chi Minh City after heavy rains. This is the latest information compiled after each heavy rain and frequent flooding of roads in Ho Chi Minh City. 
+
+Source:  [vietnamnet.vn](*https://vietnamnet.vn/interactive/canh-bao-cac-diem-ngap-ung-un-tac-o-ho-chi-minh/index.html*)
+
+Tools: R Markdown with a map features created with Leaflet. 
+
+## Map
+
+```{r setting, warning=FALSE, message=FALSE, echo=FALSE}
+if(!require("leaflet")) install.packages("leaflet")
+library(leaflet)
+
+# Preparing data
+temp <- list.files(path = "data", pattern = "*.csv", include.dirs=TRUE, full.names = TRUE)
+myfiles <- lapply(temp, read.csv)
+data <- do.call(rbind, myfiles)[,c("X", "Y", "Name")]
+names(data) <- c("lng", "lat", "name")
+
+# Show map
+data %>% 
+  leaflet(options = leafletOptions(minZoom = 0, maxZoom = 18)) %>%
+  setView(lng = 106.681630, lat = 10.782825 , zoom = 11) %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addCircleMarkers(radius = 10, color = 'red', stroke = FALSE, fillOpacity = 0.5, popup=~as.character(name))
+```
